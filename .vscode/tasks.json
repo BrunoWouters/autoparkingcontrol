@@ -7,7 +7,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/AutoParkingRetribution.NumberplateRecognition.sln"
+				"${workspaceFolder}/AutoParkingRetribution.sln"
 			],
 			"problemMatcher": "$msCompile"
 		},			

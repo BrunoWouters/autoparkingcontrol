@@ -27,12 +27,12 @@
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5000, 5001],
-	// "portsAttributes": {
-	//		"5001": {
-	//			"protocol": "https"
-	//		}
-	// }
+	"forwardPorts": [9411],
+	"portsAttributes": {
+		"9411": {
+			"protocol": "https"
+		}
+	},
 
 	// Ensure Dapr is running on opening the container
 	"postCreateCommand": "dapr uninstall --all && dapr init"

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Dapr.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,23 +17,32 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapPost("/upload", (
-    IFormFileCollection photos, 
+app.MapPost("/upload", async (
+    IFormFile photo, 
     DaprClient daprClient,
     ILogger<Program> logger) =>
 {
-//OCR
-//Bericht op bus -> nrplt + tijdstip
-    var plate = new RecognizedPlate(1, "2-DDJ-413", DateTime.UtcNow);
+    var plateRecognisedEvents = new List<PlateRecognised>();
+    var timestamp = DateTime.UtcNow;
+    var zoneId = 1;
 
-    var filenames = new List<string>();
-    foreach (var photo in photos)
-    {
-        filenames.Add(photo.FileName);
+    //TODO: photo -> OCR -> text
+    var recognisedText = "***\n2 - DDJ - 413\nB";
+
+    var europeseNummerplaatRegex = new Regex(@"(?<indexCijfer>\d)\s*-\s*(?<letters>[A-Z]+)\s*-\s*(?<cijfers>\d\d\d)"); //https://www.vlaanderen.be/de-europese-nummerplaat
+    var matches = europeseNummerplaatRegex.Matches(recognisedText).ToList();
+    if (!matches.Any()) return;
+    foreach(Match match in matches){
+        if (!match.Success)continue;
+        var indexCijfer = match.Groups["indexCijfer"].Value;
+        var letters = match.Groups["letters"].Value;
+        var cijfers = match.Groups["cijfers"].Value;
+        plateRecognisedEvents.Add(new PlateRecognised(zoneId, $"{indexCijfer}-{letters}-{cijfers}", timestamp));
     }
-    return Results.Ok(filenames);
+
+    await daprClient.BulkPublishEventAsync("pubsub", "platerecognised", plateRecognisedEvents);
 });
 
 app.Run();
 
-public record struct RecognizedPlate(int zone, string plate, DateTime timestamp);
+public record struct PlateRecognised(int zoneId, string plate, DateTime timestamp);
