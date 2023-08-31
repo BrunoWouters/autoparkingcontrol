@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoParkingRetribution.NumberplateRecognition.ApiService", "AutoParkingRetribution.NumberplateRecognition.ApiService\AutoParkingRetribution.NumberplateRecognition.ApiService.csproj", "{1F31679D-010D-4693-B0C7-47137C466348}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoParkingRetribution.ParkSession.ApiService", "AutoParkingRetribution.ParkSession.ApiService\AutoParkingRetribution.ParkSession.ApiService.csproj", "{736F3F70-F096-41A6-9AF7-45D607A03B79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{1F31679D-010D-4693-B0C7-47137C466348}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F31679D-010D-4693-B0C7-47137C466348}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F31679D-010D-4693-B0C7-47137C466348}.Release|Any CPU.Build.0 = Release|Any CPU
+		{736F3F70-F096-41A6-9AF7-45D607A03B79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{736F3F70-F096-41A6-9AF7-45D607A03B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{736F3F70-F096-41A6-9AF7-45D607A03B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{736F3F70-F096-41A6-9AF7-45D607A03B79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
