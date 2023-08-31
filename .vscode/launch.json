@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Dapr",
+            "request": "launch",
+            "type": "dapr",
+            "runFile": "${workspaceFolder}/dapr.yaml",
+            "includeApps": [
+                "numberplaterecognition-apiservice"
+            ],
+            "preLaunchTask": "dapr"
+        }
+    ]
+}

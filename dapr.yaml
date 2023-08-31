@@ -1,0 +1,6 @@
+version: 1
+apps:
+  - appID: numberplaterecognition-apiservice
+    appDirPath: ./AutoParkingRetribution.NumberplateRecognition.ApiService/
+    appPort: 5221 
+    command: ["dotnet", "run"]
