@@ -6,10 +6,10 @@ common:
   configFilePath: ./.dapr/config.yaml
 apps:
   - appID: numberplaterecognition-apiservice
-    appDirPath: ./AutoParkingRetribution.NumberplateRecognition.ApiService/
+    appDirPath: ./AutoParkingControl.NumberplateRecognition.ApiService/
     appPort: 5221 
     command: ["dotnet", "run"]
   - appID: parksession-apiservice
-    appDirPath: ./AutoParkingRetribution.ParkSession.ApiService/
+    appDirPath: ./AutoParkingControl.ParkSession.ApiService/
     appPort: 5131 
     command: ["dotnet", "run"]

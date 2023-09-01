@@ -7,9 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapr.Aspnetcore" Version="1.11.0" />
+    <PackageReference Include="Dapr.AspnetCore" Version="1.11.0" />
+    <PackageReference Include="Dapr.Actors.AspnetCore" Version="1.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AutoParkingControl.Contracts\AutoParkingControl.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
