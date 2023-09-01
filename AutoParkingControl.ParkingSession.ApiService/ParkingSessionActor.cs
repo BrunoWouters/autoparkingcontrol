@@ -64,7 +64,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     private async Task SendParkingFeeAsync()
     {
         if (_state.ParkingFeeSent) return;
-        await _daprClient.PublishEventAsync("pubsub", nameof(RequiredSessionNotFound), new RequiredSessionNotFound(Id.GetId(), _state.LastSeen.Value));
+        await _daprClient.PublishEventAsync("pubsub", nameof(RequiredSessionNotFound), new RequiredSessionNotFound(Id.GetId(), _state.LastSeen.GetValueOrDefault()));
         await RegisterExpiryReminderAsync();
         _state.ParkingFeeSent = true;
     }

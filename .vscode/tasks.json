@@ -1,14 +1,6 @@
 {
     "version": "2.0.0",
-    "tasks": [	
-		{
-			"label": "dapr",
-			"type": "dapr",
-			"runFile": "./dapr.yaml",
-			"dependsOn": [
-				"build"
-			]
-		},
+    "tasks": [
 		{
 			"label": "build",
 			"command": "dotnet",
@@ -17,7 +9,19 @@
 				"build",
 				"${workspaceFolder}/AutoParkingControl.sln"
 			],
+			"group":{
+				"kind": "build",
+				"isDefault": true
+			},
 			"problemMatcher": "$msCompile"
+		},			
+		{
+			"label": "dapr",
+			"type": "dapr",
+			"runFile": "./dapr.yaml",
+			"dependsOn": [
+				"build"
+			]
 		}
     ]
 }
