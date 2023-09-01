@@ -6,10 +6,6 @@
             "request": "launch",
             "type": "dapr",
             "runFile": "${workspaceFolder}/dapr.yaml",
-            "includeApps": [
-                "numberplaterecognition-apiservice",
-                "parkingsession-apiservice"
-            ],
             "preLaunchTask": "dapr"
         }
     ]

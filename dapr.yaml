@@ -13,3 +13,7 @@ apps:
     appDirPath: ./AutoParkingControl.ParkingSession.ApiService/
     appPort: 5131 
     command: ["dotnet", "run"]
+  - appID: parkingfee-apiservice
+    appDirPath: ./AutoParkingControl.ParkingFee.AppService/
+    appPort: 5261 
+    command: ["dotnet", "run"]

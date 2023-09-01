@@ -27,7 +27,7 @@
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [9411, 6379],
+	"forwardPorts": [9411, 6379, 1080],
 	"portsAttributes": {
 		"9411": {
 			"protocol": "https",
@@ -35,11 +35,14 @@
 		},
 		"6379": {
 			"label": "Redis"
+		},
+		"1080": {
+			"label": "MailDev"
 		}
 	},
 
-	// Ensure Dapr is running on opening the container
-	"postCreateCommand": "dapr uninstall --all && dapr init"
+	// Ensure Dapr is running on opening the container&
+	"postCreateCommand": "dapr uninstall --all && docker container prune -f && dapr init && docker run -p 1080:1080 -p 1025:1025 --name maildev maildev/maildev"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
