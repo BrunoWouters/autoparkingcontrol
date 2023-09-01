@@ -2,30 +2,33 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 {
     private ParkingSessionState _state;
     private readonly DaprClient _daprClient;
+    private bool _isExpired;
 
     public ParkingSessionActor(ActorHost host, DaprClient daprClient) : base(host)
     {
         _daprClient = daprClient;
+        _state = new ParkingSessionState();
     }
 
     public async Task RegisterVehicleDetectionAsync(RegisterVehicleDetection registerLocation)
     {
+        _state.LastSeen = registerLocation.Timestamp;
         if (_state.PaidSessionStartedOn.HasValue || _state.ParkingFeeSent)
         {
             return;
         }
 
-        var checkSessionStatusAfterGracePeriodReminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
-        if (checkSessionStatusAfterGracePeriodReminder != null)
+        var reminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
+        if (reminder is null)
         {
-            await RegisterReminderAsync(nameof(checkSessionStatusAfterGracePeriodReminder), null, TimeSpan.FromMinutes(10), Timeout.InfiniteTimeSpan);
+            await RegisterReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync), null, TimeSpan.FromMinutes(1), Timeout.InfiniteTimeSpan);
         }
     }
 
-    public Task StartSessionAsync(StartSession registerPayment)
+    public async Task StartSessionAsync(StartSession registerPayment)
     {
         _state.PaidSessionStartedOn = registerPayment.Timestamp;
-        return Task.CompletedTask;
+        await RegisterExpiryReminderAsync();
     }
 
     public async Task StopSessionAsync(StopSession registerPayment)
@@ -62,6 +65,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     {
         if (_state.ParkingFeeSent) return;
         await _daprClient.PublishEventAsync("pubsub", nameof(RequiredSessionNotFound), new RequiredSessionNotFound(Id.GetId(), _state.LastSeen.Value));
+        await RegisterExpiryReminderAsync();
         _state.ParkingFeeSent = true;
     }
 
@@ -77,6 +81,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 
     private async Task RemoveSessionAsync()
     {
+        _isExpired = true;
         await StateManager.RemoveStateAsync(nameof(ParkingSessionState));
         await UnregisterReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         await UnregisterReminderAsync(nameof(ExpiryReminderAsync));
@@ -84,13 +89,13 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 
     protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
     {
-        //unless expired?
+        if(_isExpired) return;
         await StateManager.SetStateAsync(nameof(ParkingSessionState), _state);
     }
 
     protected override async Task OnActivateAsync()
     {
-        _state = await StateManager.GetStateAsync<ParkingSessionState>(nameof(ParkingSessionState))
-            ?? new ParkingSessionState();
+        var tryGetResult = await StateManager.TryGetStateAsync<ParkingSessionState>(nameof(ParkingSessionState));
+        _state = tryGetResult.HasValue ? tryGetResult.Value : new ParkingSessionState();
     }
 }

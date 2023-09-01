@@ -8,7 +8,7 @@
             "runFile": "${workspaceFolder}/dapr.yaml",
             "includeApps": [
                 "numberplaterecognition-apiservice",
-                "parksession-apiservice"
+                "parkingsession-apiservice"
             ],
             "preLaunchTask": "dapr"
         }

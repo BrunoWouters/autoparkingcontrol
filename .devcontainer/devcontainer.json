@@ -27,15 +27,28 @@
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [9411],
+	"forwardPorts": [9411, 8080],
 	"portsAttributes": {
 		"9411": {
-			"protocol": "https"
+			"protocol": "https",
+			"label": "Zipkin portal"
+		},
+		"8080": {
+			"protocol": "http",
+			"label": "Dapr Dashboard"
+		},
+		"6379": {
+			"label": "Redis"
 		}
 	},
 
 	// Ensure Dapr is running on opening the container
-	"postCreateCommand": "dapr uninstall --all && dapr init"
+	"postCreateCommand": "dapr uninstall --all && dapr init && dapr dashboard"
+	
+	// "postCreateCommand": {
+	// 	"dapr": "dapr uninstall --all && dapr init && dapr dashboard",
+	// 	"redis-commander": "docker pull rediscommander/redis-commander"
+	// }
 
 	// Configure tool-specific properties.
 	// "customizations": {},

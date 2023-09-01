@@ -9,7 +9,7 @@ apps:
     appDirPath: ./AutoParkingControl.NumberplateRecognition.ApiService/
     appPort: 5221 
     command: ["dotnet", "run"]
-  - appID: parksession-apiservice
-    appDirPath: ./AutoParkingControl.ParkSession.ApiService/
+  - appID: parkingsession-apiservice
+    appDirPath: ./AutoParkingControl.ParkingSession.ApiService/
     appPort: 5131 
     command: ["dotnet", "run"]
