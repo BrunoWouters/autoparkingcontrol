@@ -5,8 +5,8 @@ common:
   daprdLogDestination: console
   configFilePath: ./.dapr/config.yaml
 apps:
-  - appID: numberplaterecognition-apiservice
-    appDirPath: ./AutoParkingControl.NumberplateRecognition.ApiService/
+  - appID: licenceplaterecognition-apiservice
+    appDirPath: ./AutoParkingControl.LicencePlateRecognition.ApiService/
     appPort: 5221 
     command: ["dotnet", "run"]
   - appID: parkingsession-apiservice

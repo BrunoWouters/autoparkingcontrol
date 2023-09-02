@@ -21,7 +21,6 @@ app.UseCloudEvents();
 app.UseRouting();
 app.MapSubscribeHandler();
 
-
 app.MapPost("/sendfine", async ([FromBody] RequiredSessionNotFound requiredSessionNotFound, DaprClient daprClient) =>
 {
     var body = 
