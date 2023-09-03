@@ -13,7 +13,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -109,8 +108,8 @@ async Task ProcesExtractedTextAsync(DateTime timestamp, string? extractedText)
         var indexCijfer = match.Groups["indexCijfer"].Value;
         var letters = match.Groups["letters"].Value;
         var cijfers = match.Groups["cijfers"].Value;
-        var licencePlate = $"{indexCijfer}-{letters}-{cijfers}";
-        var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licencePlate), "ParkingSessionActor");
+        var licensePlate = $"{indexCijfer}-{letters}-{cijfers}";
+        var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor");
         await parkingSessionActor.RegisterVehicleDetectionAsync(new RegisterVehicleDetection(timestamp));
     }
 }

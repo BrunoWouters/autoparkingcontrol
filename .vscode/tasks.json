@@ -1,16 +1,13 @@
 {
-    "version": "2.0.0",
-    "tasks": [
+	"version": "2.0.0",
+	"tasks": [
 		{
 			"label": "dapr",
 			"type": "dapr",
 			"runFile": "./dapr.yaml",
 			"dependsOn": [
 				"build"
-			],
-			"problemMatcher": [
-				"$tsc"
-			],
+			]
 		},
 		{
 			"type": "dotnet",
@@ -22,7 +19,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "dotnet: build"
+			"label": "build",
 		}
 	]
 }

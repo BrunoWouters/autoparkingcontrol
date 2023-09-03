@@ -44,7 +44,7 @@
 	"onCreateCommand": "docker container prune -f",
 	// Ensure Dapr is running on opening the container&
 	"postCreateCommand": {
-		"MailDev": "docker run -p 1080:1080 -p 1025:1025 --name maildev maildev/maildev",
+		"MailDev": "docker run -p 1080:1080 -p 1025:1025 -d --name maildev maildev/maildev",
 		"Dapr": "dapr uninstall --all && dapr init"
 	}
 	// Configure tool-specific properties.

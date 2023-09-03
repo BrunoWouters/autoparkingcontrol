@@ -1,22 +1,34 @@
+
 public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 {
     private ParkingSessionState _state;
     private readonly DaprClient _daprClient;
+    private readonly HttpClient _daprHttpClient;
     private bool _isExpired;
 
     public ParkingSessionActor(ActorHost host, DaprClient daprClient) : base(host)
     {
         _daprClient = daprClient;
+        _daprHttpClient = DaprClient.CreateInvokeHttpClient();
         _state = new ParkingSessionState();
     }
 
     public async Task RegisterVehicleDetectionAsync(RegisterVehicleDetection registerLocation)
     {
         _state.LastSeen = registerLocation.Timestamp;
+        var hasPermit = await _daprHttpClient.GetFromJsonAsync<bool>($"https://residents-apiservice/licenseplatehaspermit/{Id.GetId()}");
+        if(hasPermit)
+        {
+            await RemoveSessionAsync();
+            return;
+        }
+        
         if (_state.PaidSessionStartedOn.HasValue || _state.ParkingFeeSent)
         {
             return;
         }
+
+
 
         var reminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         if (reminder is null)

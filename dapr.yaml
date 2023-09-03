@@ -7,8 +7,8 @@ common:
   enableApiLogging: false
   #logLevel: debug
 apps:
-  - appID: licenceplaterecognition-apiservice
-    appDirPath: ./AutoParkingControl.LicencePlateRecognition.ApiService/
+  - appID: licenseplaterecognition-apiservice
+    appDirPath: ./AutoParkingControl.LicensePlateRecognition.ApiService/
     appPort: 5221 
     daprHTTPMaxRequestSize: 15
     command: ["dotnet", "run"]
@@ -19,4 +19,12 @@ apps:
   - appID: parkingfee-apiservice
     appDirPath: ./AutoParkingControl.ParkingFee.AppService/
     appPort: 5261 
+    command: ["dotnet", "run"]
+  - appID: smsprocessing-apiservice
+    appDirPath: ./AutoParkingControl.SmsProcessing.ApiService/
+    appPort: 5024 
+    command: ["dotnet", "run"]
+  - appID: residents-apiservice
+    appDirPath: ./AutoParkingControl.Residents.ApiService/
+    appPort: 5114 
     command: ["dotnet", "run"]

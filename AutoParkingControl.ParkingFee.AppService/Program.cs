@@ -24,7 +24,7 @@ app.MapSubscribeHandler();
 app.MapPost("/sendfine", async ([FromBody] RequiredSessionNotFound requiredSessionNotFound, DaprClient daprClient) =>
 {
     var body = 
-    @$"<b>Fine for {requiredSessionNotFound.LicencePlate}</b><br>
+    @$"<b>Fine for {requiredSessionNotFound.LicensePlate}</b><br>
     On {requiredSessionNotFound.VehicleDetectedOn.ToLocalTime():G} we found your vehicle parked without a valid session.";
     await daprClient.InvokeBindingAsync("smtp", "create", body, new Dictionary<string, string>{
         {"emailFrom", "finedep@autoparkingcontrol.com"},

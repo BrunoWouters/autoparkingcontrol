@@ -10,3 +10,5 @@ spec:
     secretKeyRef:
       name: computervision
       key: apikey
+auth:
+  secretStore: apc-secret-store
