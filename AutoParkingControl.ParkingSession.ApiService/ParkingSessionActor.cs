@@ -94,14 +94,20 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     private async Task RemoveSessionAsync()
     {
         _isExpired = true;
-        await StateManager.RemoveStateAsync(nameof(ParkingSessionState));
+        _state = new ParkingSessionState();
+        await StateManager.TryRemoveStateAsync(nameof(ParkingSessionState));
         await UnregisterReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         await UnregisterReminderAsync(nameof(ExpiryReminderAsync));
     }
 
     protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
     {
-        if(_isExpired) return;
+        if(_isExpired) {
+            //Make sure the actor is valid if a call is made to this actor before it is removed.
+            _isExpired = false;
+            return;
+        }
+
         await StateManager.SetStateAsync(nameof(ParkingSessionState), _state);
     }
 

@@ -7,7 +7,7 @@
 			"runFile": "./dapr.yaml",
 			"dependsOn": [
 				"build"
-			]
+			] 
 		},
 		{
 			"type": "dotnet",
@@ -19,7 +19,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "build",
+			"label": "build", 
 		}
 	]
 }

@@ -18,8 +18,10 @@
 		"vscode": {
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
-				"ms-azuretools.vscode-dapr",
-				"ms-dotnettools.csdevkit"
+				"ms-dotnettools.csharp",
+				"ms-dotnettools.csdevkit",
+				"ms-dotnettools.vscodeintellicode-csharp",
+				"ms-azuretools.vscode-dapr"
 			]
 		}
 	},
