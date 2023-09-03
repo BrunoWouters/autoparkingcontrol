@@ -1,27 +1,28 @@
 {
     "version": "2.0.0",
-    "tasks": [	
-		{
-			"label": "build",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"build",
-				"${workspaceFolder}/AutoParkingControl.sln"
-			],
-			"group":{
-				"kind": "build",
-				"isDefault": true
-			},
-			"problemMatcher": "$msCompile"
-		},		
+    "tasks": [
 		{
 			"label": "dapr",
 			"type": "dapr",
 			"runFile": "./dapr.yaml",
 			"dependsOn": [
 				"build"
-			]
+			],
+			"problemMatcher": [
+				"$tsc"
+			],
+		},
+		{
+			"type": "dotnet",
+			"task": "build",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "dotnet: build"
 		}
-    ]
+	]
 }

@@ -4,7 +4,6 @@
 	"name": "C# (.NET)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/dotnet:0-7.0",
-
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		// Install the Dapr CLI
@@ -14,10 +13,9 @@
 		// Alternatively, use Docker-outside-of-Docker (uses Docker in the host)
 		//"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
 	},
-
 	"customizations": {
 		// Configure properties specific to VS Code.
-		"vscode": {	
+		"vscode": {
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-azuretools.vscode-dapr",
@@ -25,9 +23,12 @@
 			]
 		}
 	},
-	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [9411, 6379, 1080],
+	"forwardPorts": [
+		9411,
+		6379,
+		1080
+	],
 	"portsAttributes": {
 		"9411": {
 			"protocol": "https",
@@ -40,13 +41,14 @@
 			"label": "MailDev"
 		}
 	},
-
+	"onCreateCommand": "docker container prune -f",
 	// Ensure Dapr is running on opening the container&
-	"postCreateCommand": "dapr uninstall --all && docker container prune -f && dapr init && docker run -p 1080:1080 -p 1025:1025 --name maildev maildev/maildev"
-
+	"postCreateCommand": {
+		"MailDev": "docker run -p 1080:1080 -p 1025:1025 --name maildev maildev/maildev",
+		"Dapr": "dapr uninstall --all && dapr init"
+	}
 	// Configure tool-specific properties.
 	// "customizations": {},
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }

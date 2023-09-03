@@ -1,0 +1,12 @@
+apiVersion: dapr.io/v1alpha1
+kind: HTTPEndpoint
+metadata:
+  name: computervision
+spec:
+  version: v1alpha1
+  baseUrl: https://westeurope.api.cognitive.microsoft.com
+  headers: 
+  - name: Ocp-Apim-Subscription-Key
+    secretKeyRef:
+      name: computervision
+      key: apikey

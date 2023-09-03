@@ -1,13 +1,16 @@
 version: 1
 common:
   resourcesPath: ./.dapr/components
-  appLogDestination: console
-  daprdLogDestination: console
+  appLogDestination: file
+  daprdLogDestination: file
   configFilePath: ./.dapr/config.yaml
+  enableApiLogging: false
+  #logLevel: debug
 apps:
   - appID: licenceplaterecognition-apiservice
     appDirPath: ./AutoParkingControl.LicencePlateRecognition.ApiService/
     appPort: 5221 
+    daprHTTPMaxRequestSize: 15
     command: ["dotnet", "run"]
   - appID: parkingsession-apiservice
     appDirPath: ./AutoParkingControl.ParkingSession.ApiService/

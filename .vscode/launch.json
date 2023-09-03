@@ -6,6 +6,8 @@
             "request": "launch",
             "type": "dapr",
             "runFile": "${workspaceFolder}/dapr.yaml",
+            "includeApps": [
+            ],
             "preLaunchTask": "dapr"
         }
     ]
