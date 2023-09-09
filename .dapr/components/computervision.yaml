@@ -8,7 +8,7 @@ spec:
   headers: 
   - name: Ocp-Apim-Subscription-Key
     secretKeyRef:
-      name: computervision
-      key: apikey
+      name: computerVision
+      key: apiKey
 auth:
   secretStore: apc-secret-store

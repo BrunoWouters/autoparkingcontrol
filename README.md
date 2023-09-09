@@ -29,3 +29,8 @@ http://localhost:1080 (smtp: 1025)
 
 ### Zipkin
 http://localhost:9411
+
+## Usefull links
+https://learn.microsoft.com/en-us/dotnet/architecture/dapr-for-net-developers/
+https://docs.dapr.io/
+https://github.com/dapr/

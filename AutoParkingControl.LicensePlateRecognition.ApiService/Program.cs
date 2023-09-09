@@ -12,9 +12,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDaprClient();
 
+//Load secrets into .NET configuration API.
 var client = new DaprClientBuilder().Build();
-builder.Configuration.AddDaprConfigurationStore("apc-secret-store", new List<string>() { "computervision" }, client, TimeSpan.FromSeconds(20));
-builder.Configuration.AddStreamingDaprConfigurationStore("apc-secret-store", new List<string>() { "computervision" }, client, TimeSpan.FromSeconds(20));
+builder.Configuration.AddDaprSecretStore(
+    "apc-secret-store",
+    new List<DaprSecretDescriptor> { new("computerVision") },
+    client);
+builder.Configuration.AddDaprConfigurationStore(
+    "apc-configuration",
+    new List<string> { "licencePlateRecognition:offlinelicenseplates" },
+    client,
+    TimeSpan.FromSeconds(20),
+    new Dictionary<string, string> { { "label", "demo" } });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,7 +32,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient("DirectComputerVisionHttpClient", (serviceProvider, httpClient) =>
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var apiKey = configuration.GetSection("computervision")["apikey"];
+    var apiKey = configuration.GetSection("computerVision")["apiKey"];
     httpClient.BaseAddress = new Uri("https://westeurope.api.cognitive.microsoft.com");
     httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
 });
@@ -84,10 +93,17 @@ app.MapPost("/upload", async (IFormFile photo, IHttpClientFactory httpClientFact
 });
 
 app.MapPost("/uploadoffline", async (
-    string extractedText,
+    string? extractedText,
+    IConfiguration configuration,
     ILogger<Program> logger) =>
 {
     var timestamp = DateTime.UtcNow;
+    if (extractedText == null)
+    {
+        var offlinelicenseplates = configuration.GetSection("licencePlateRecognition")["offlinelicenseplates"].Split("\r\n");
+        extractedText = offlinelicenseplates.OrderBy(x => Guid.NewGuid()).First();
+    }
+
     await ProcesExtractedTextAsync(timestamp, extractedText);
 });
 
