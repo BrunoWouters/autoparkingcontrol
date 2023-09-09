@@ -1,15 +1,39 @@
 using System.Text.RegularExpressions;
 using Dapr.Client;
+using Microsoft.AspNetCore.Hosting;
+using Dapr.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using AutoParkingControl.Contracts.Actors;
 using Dapr.Actors.Client;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDaprClient();
 
+var client = new DaprClientBuilder().Build();
+builder.Configuration.AddDaprConfigurationStore("apc-secret-store", new List<string>() { "computervision" }, client, TimeSpan.FromSeconds(20));
+builder.Configuration.AddStreamingDaprConfigurationStore("apc-secret-store", new List<string>() { "computervision" }, client, TimeSpan.FromSeconds(20));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Register HttpClient without any Dapr service invocation but with Dapr sourced configuration.
+builder.Services.AddHttpClient("DirectComputerVisionHttpClient", (serviceProvider, httpClient) =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var apiKey = configuration.GetSection("computervision")["apikey"];
+    httpClient.BaseAddress = new Uri("https://westeurope.api.cognitive.microsoft.com");
+    httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
+});
+
+//Register HttpClient with Dapr InvocationHandler to use Dapr service invocation.
+builder.Services.AddHttpClient("DaprHttpClient", httpClient =>
+{
+    //Set the base address to the name of the HTTPEndpoint (or appid).
+    httpClient.BaseAddress = new Uri("http://computervision");
+}).AddHttpMessageHandler(() => new InvocationHandler());
 
 var app = builder.Build();
 
@@ -19,10 +43,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapPost("/test", async (IFormFile photo, DaprClient daprClient) =>
+//Upload without any Dapr component.
+app.MapPost("/uploaddirect", async (IFormFile photo, IHttpClientFactory httpClientFactory) =>
 {
     var timestamp = DateTime.UtcNow;
-    var httpClient = new HttpClient(); //TODO: Cache http client
     ByteArrayContent photoContent;
     using (var photoStream = new MemoryStream())
     {
@@ -30,23 +54,19 @@ app.MapPost("/test", async (IFormFile photo, DaprClient daprClient) =>
         photoContent = new ByteArrayContent(photoStream.ToArray());
     }
 
-    var ocrUrl = "https://westeurope.api.cognitive.microsoft.com/computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
-    var apiKey = (await daprClient.GetSecretAsync("apc-secret-store", "computervision"))["apikey"];
-    httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
+    var httpClient = httpClientFactory.CreateClient("DirectComputerVisionHttpClient");
+    var url = "computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
     photoContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-    var response = await httpClient.PostAsync(ocrUrl, photoContent);
+    var response = await httpClient.PostAsync(url, photoContent);
     var imageAnalysisResult = await response.Content.ReadFromJsonAsync<ImageAnalysisResult>();
 
     await ProcesExtractedTextAsync(timestamp, imageAnalysisResult?.ReadResult?.Content);
 });
 
-app.MapPost("/invokehttpendpoint", async (IFormFile photo, DaprClient daprClient) =>
+//Upload using HTTPEndpoint computervision.
+app.MapPost("/upload", async (IFormFile photo, IHttpClientFactory httpClientFactory) =>
 {
     var timestamp = DateTime.UtcNow;
-
-    var httpClient = DaprClient.CreateInvokeHttpClient();
-
-
     ByteArrayContent photoContent;
     using (var photoStream = new MemoryStream())
     {
@@ -54,52 +74,37 @@ app.MapPost("/invokehttpendpoint", async (IFormFile photo, DaprClient daprClient
         photoContent = new ByteArrayContent(photoStream.ToArray());
     }
 
-    var ocrUrl = "http://computervision/computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
+    var httpClient = httpClientFactory.CreateClient("DaprHttpClient");
+    var url = "computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
     photoContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-    var response = await httpClient.PostAsync(ocrUrl, photoContent);
+    var response = await httpClient.PostAsync(url, photoContent);
     var imageAnalysisResult = await response.Content.ReadFromJsonAsync<ImageAnalysisResult>();
 
     await ProcesExtractedTextAsync(timestamp, imageAnalysisResult?.ReadResult?.Content);
 });
 
-app.MapPost("/invokefqdn", async (IFormFile photo, DaprClient daprClient) =>
-{
-    var timestamp = DateTime.UtcNow;
-
-    var httpClient = new HttpClient();
-
-    ByteArrayContent photoContent;
-    using (var photoStream = new MemoryStream())
-    {
-        await photo.CopyToAsync(photoStream);
-        photoContent = new ByteArrayContent(photoStream.ToArray());
-    }
-
-    var ocrUrl = $"http://localhost:{Environment.GetEnvironmentVariable("DAPR_HTTP_PORT")}/v1.0/invoke/https://westeurope.api.cognitive.microsoft.com/method/computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
-    photoContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-    var apiKey = (await daprClient.GetSecretAsync("apc-secret-store", "computervision"))["apikey"];
-    httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
-    var response = await httpClient.PostAsync(ocrUrl, photoContent);
-    var imageAnalysisResult = await response.Content.ReadFromJsonAsync<ImageAnalysisResult>();
-
-    await ProcesExtractedTextAsync(timestamp, imageAnalysisResult?.ReadResult?.Content);
-});
-
-app.MapPost("/upload", async (
-    IFormFile photo,
+app.MapPost("/uploadoffline", async (
+    string extractedText,
     ILogger<Program> logger) =>
 {
     var timestamp = DateTime.UtcNow;
-    await ProcesExtractedTextAsync(timestamp, "***\n2 - DDJ - 413\nB");
+    await ProcesExtractedTextAsync(timestamp, extractedText);
+});
+
+app.Use(next => context =>
+{
+    return next(context);
 });
 
 
 app.Run();
 
 
+
+
 async Task ProcesExtractedTextAsync(DateTime timestamp, string? extractedText)
 {
-    if(extractedText == null) return;
+    if (extractedText == null) return;
     var europeseNummerplaatRegex = new Regex(@"(?<indexCijfer>\d)\s*-\s*(?<letters>[A-Z]+)\s*-\s*(?<cijfers>\d\d\d)"); //https://www.vlaanderen.be/de-europese-nummerplaat
     var matches = europeseNummerplaatRegex.Matches(extractedText).ToList();
     foreach (Match match in matches)
@@ -123,3 +128,5 @@ public class ImageAnalysisResult
 {
     public ReadResult? ReadResult { get; set; }
 }
+
+

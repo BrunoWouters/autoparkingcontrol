@@ -4,8 +4,8 @@ common:
   appLogDestination: file
   daprdLogDestination: file
   configFilePath: ./.dapr/config.yaml
-  enableApiLogging: false
-  #logLevel: debug
+  enableApiLogging: true
+  logLevel: debug
 apps:
   - appID: licenseplaterecognition-apiservice
     appDirPath: ./AutoParkingControl.LicensePlateRecognition.ApiService/

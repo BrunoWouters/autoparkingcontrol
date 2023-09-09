@@ -1,14 +1,7 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "dapr",
-			"type": "dapr",
-			"runFile": "./dapr.yaml",
-			"dependsOn": [
-				"build"
-			] 
-		},
+		
 		{
 			"type": "dotnet",
 			"task": "build",
@@ -20,6 +13,14 @@
 				"isDefault": true
 			},
 			"label": "build", 
+		},
+		{
+			"label": "dapr",
+			"type": "dapr",
+			"runFile": "./dapr.yaml",
+			"dependsOn": [
+				"build"
+			] 
 		}
 	]
 }
