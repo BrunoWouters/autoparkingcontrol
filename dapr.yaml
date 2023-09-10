@@ -1,11 +1,11 @@
 version: 1
 common:
   resourcesPath: ./.dapr/components
-  appLogDestination: file
-  daprdLogDestination: file
+  appLogDestination: console
+  daprdLogDestination: console
   configFilePath: ./.dapr/config.yaml
   enableApiLogging: true
-  logLevel: debug
+  #logLevel: debug
 apps:
   - appID: licenseplaterecognition-apiservice
     appDirPath: ./AutoParkingControl.LicensePlateRecognition.ApiService/

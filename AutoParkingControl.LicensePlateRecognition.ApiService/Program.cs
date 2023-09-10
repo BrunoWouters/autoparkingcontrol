@@ -16,8 +16,9 @@ builder.Services.AddDaprClient();
 var client = new DaprClientBuilder().Build();
 builder.Configuration.AddDaprSecretStore(
     "apc-secret-store",
-    new List<DaprSecretDescriptor> { new("computerVision") },
-    client);
+    new List<DaprSecretDescriptor> { new("computerVision:apiKey") },
+    client,
+    TimeSpan.FromSeconds(20));
 builder.Configuration.AddDaprConfigurationStore(
     "apc-configuration",
     new List<string> { "licencePlateRecognition:offlinelicenseplates" },
@@ -32,7 +33,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient("DirectComputerVisionHttpClient", (serviceProvider, httpClient) =>
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var apiKey = configuration.GetSection("computerVision")["apiKey"];
+    var apiKey = configuration["computerVision:apiKey"];
     httpClient.BaseAddress = new Uri("https://westeurope.api.cognitive.microsoft.com");
     httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
 });

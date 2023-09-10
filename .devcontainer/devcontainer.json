@@ -21,7 +21,8 @@
 				"ms-dotnettools.csharp",
 				"ms-dotnettools.csdevkit",
 				"ms-dotnettools.vscodeintellicode-csharp",
-				"ms-azuretools.vscode-dapr"
+				"ms-azuretools.vscode-dapr",
+				"humao.rest-client"
 			]
 		}
 	},
@@ -47,7 +48,7 @@
 	// Ensure Dapr is running on opening the container&
 	"postCreateCommand": {
 		"MailDev": "docker run -p 1080:1080 -p 1025:1025 -d --name maildev maildev/maildev",
-		"Dapr": "dapr uninstall --all && dapr init"
+		"Dapr": "dapr uninstall --all && dapr init && dapr run --dapr-http-port 3500 --app-id vscode --dapr-http-max-request-size 50"
 	}
 	// Configure tool-specific properties.
 	// "customizations": {},
