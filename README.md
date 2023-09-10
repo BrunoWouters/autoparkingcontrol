@@ -34,3 +34,4 @@ http://localhost:9411
 https://learn.microsoft.com/en-us/dotnet/architecture/dapr-for-net-developers/
 https://docs.dapr.io/
 https://github.com/dapr/
+https://www.youtube.com/@DaprDev
