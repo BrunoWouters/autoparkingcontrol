@@ -19,8 +19,8 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-dotnettools.csharp",
-				"ms-dotnettools.csdevkit",
 				"ms-dotnettools.vscodeintellicode-csharp",
+				"ms-dotnettools.csdevkit",
 				"ms-azuretools.vscode-dapr",
 				"humao.rest-client"
 			]
@@ -30,7 +30,8 @@
 	"forwardPorts": [
 		9411,
 		6379,
-		1080
+		1080,
+		9090
 	],
 	"portsAttributes": {
 		"9411": {
@@ -42,12 +43,16 @@
 		},
 		"1080": {
 			"label": "MailDev"
+		},
+		"9090": {
+			"label": "Prometheus"
 		}
 	},
 	"onCreateCommand": "docker container prune -f",
-	// Ensure Dapr is running on opening the container&
+	// Ensure Dapr is running on opening the container
 	"postCreateCommand": {
 		"MailDev": "docker run -p 1080:1080 -p 1025:1025 -d --name maildev maildev/maildev",
+	 	"Prometheus": "docker run --net=host -v ./prometheus.yaml:/etc/prometheus/prometheus.yaml --name prometheus prom/prometheus --config.file=/etc/prometheus/prometheus.yaml",
 		"Dapr": "dapr uninstall --all && dapr init"
 	}
 	// Configure tool-specific properties.

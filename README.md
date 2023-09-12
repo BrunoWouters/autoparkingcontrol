@@ -30,6 +30,9 @@ http://localhost:1080 (smtp: 1025)
 ### Zipkin
 http://localhost:9411
 
+### Prometheus
+http://localhost:9090
+
 ## Usefull links
 https://learn.microsoft.com/en-us/dotnet/architecture/dapr-for-net-developers/
 https://docs.dapr.io/

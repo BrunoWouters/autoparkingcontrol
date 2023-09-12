@@ -10,21 +10,26 @@ apps:
   - appID: licenseplaterecognition-apiservice
     appDirPath: ./AutoParkingControl.LicensePlateRecognition.ApiService/
     appPort: 5221 
+    metricsPort: 9091
     daprHTTPMaxRequestSize: 15
     command: ["dotnet", "run"]
   - appID: parkingsession-apiservice
     appDirPath: ./AutoParkingControl.ParkingSession.ApiService/
     appPort: 5131 
+    metricsPort: 9092
     command: ["dotnet", "run"]
   - appID: parkingfee-apiservice
     appDirPath: ./AutoParkingControl.ParkingFee.AppService/
     appPort: 5261 
+    metricsPort: 9093
     command: ["dotnet", "run"]
   - appID: smsprocessing-apiservice
     appDirPath: ./AutoParkingControl.SmsProcessing.ApiService/
     appPort: 5024 
+    metricsPort: 9094
     command: ["dotnet", "run"]
   - appID: residents-apiservice
     appDirPath: ./AutoParkingControl.Residents.ApiService/
     appPort: 5114 
+    metricsPort: 9095
     command: ["dotnet", "run"]
