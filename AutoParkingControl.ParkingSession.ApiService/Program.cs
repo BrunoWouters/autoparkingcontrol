@@ -1,8 +1,8 @@
-global using Dapr.Client;
-global using Dapr.Actors;
-global using AutoParkingControl.Contracts.Actors;
-global using AutoParkingControl.Contracts.Events;
-global using Dapr.Actors.Runtime;
+using Dapr.Client;
+using Dapr.Actors;
+using AutoParkingControl.Contracts.Actors;
+using AutoParkingControl.Contracts.Events;
+using Dapr.Actors.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 

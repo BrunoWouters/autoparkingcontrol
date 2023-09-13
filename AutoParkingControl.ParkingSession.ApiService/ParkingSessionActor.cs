@@ -1,3 +1,8 @@
+using Dapr.Client;
+using Dapr.Actors;
+using AutoParkingControl.Contracts.Actors;
+using AutoParkingControl.Contracts.Events;
+using Dapr.Actors.Runtime;
 
 public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 {
@@ -27,8 +32,6 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
         {
             return;
         }
-
-
 
         var reminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         if (reminder is null)
@@ -100,20 +103,20 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
         await UnregisterReminderAsync(nameof(ExpiryReminderAsync));
     }
 
+    protected override async Task OnActivateAsync()
+    {
+        var tryGetResult = await StateManager.TryGetStateAsync<ParkingSessionState>(nameof(ParkingSessionState));
+        _state = tryGetResult.HasValue ? tryGetResult.Value : new ParkingSessionState();
+    }
+
     protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
     {
         if(_isExpired) {
-            //Make sure the actor is valid if a call is made to this actor before it is removed.
+            //The actor has expired and does not need to be saved.
             _isExpired = false;
             return;
         }
 
         await StateManager.SetStateAsync(nameof(ParkingSessionState), _state);
-    }
-
-    protected override async Task OnActivateAsync()
-    {
-        var tryGetResult = await StateManager.TryGetStateAsync<ParkingSessionState>(nameof(ParkingSessionState));
-        _state = tryGetResult.HasValue ? tryGetResult.Value : new ParkingSessionState();
     }
 }
