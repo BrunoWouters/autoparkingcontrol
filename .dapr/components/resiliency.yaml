@@ -1,0 +1,9 @@
+spec:
+  policies:
+    timeouts:
+      DefaultTimeoutPolicy: 1000s
+    retries:
+      DefaultRetryPolicy:
+        policy: constant
+        duration: 5s
+        maxRetries: 0

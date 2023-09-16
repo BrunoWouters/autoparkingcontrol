@@ -43,6 +43,7 @@ builder.Services.AddHttpClient("DirectComputerVisionHttpClient", (serviceProvide
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var apiKey = configuration["apiKey"];
+    httpClient.Timeout = TimeSpan.FromSeconds(1000);
     httpClient.BaseAddress = new Uri("https://westeurope.api.cognitive.microsoft.com");
     httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", apiKey);
 });
@@ -130,7 +131,7 @@ app.Run();
 async Task ProcesExtractedTextAsync(DateTime timestamp, string? extractedText)
 {
     if (extractedText == null) return;
-    var europeseNummerplaatRegex = new Regex(@"(?<indexCijfer>\d)\s*-\s*(?<letters>[A-Z]+)\s*-\s*(?<cijfers>\d\d\d)"); //https://www.vlaanderen.be/de-europese-nummerplaat
+    var europeseNummerplaatRegex = new Regex(@"(?<indexCijfer>\d)[\sº]*-?\s*(?<letters>[A-Z]+)\s*-?\s*(?<cijfers>\d\d\d)"); //https://www.vlaanderen.be/de-europese-nummerplaat
     var matches = europeseNummerplaatRegex.Matches(extractedText).ToList();
     foreach (Match match in matches)
     {
