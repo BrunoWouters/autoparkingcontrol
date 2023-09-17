@@ -18,13 +18,17 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/start", async (string licensePlate) =>
 {
-    var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor");
+    var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(
+        new Dapr.Actors.ActorId(licensePlate), 
+        "ParkingSessionActor");
     await parkingSessionActor.StartSessionAsync(new StartSession(DateTime.UtcNow));
 });
 
 app.MapGet("/stop", async (string licensePlate) =>
 {
-    var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor");
+    var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(
+        new Dapr.Actors.ActorId(licensePlate), 
+        "ParkingSessionActor");
     await parkingSessionActor.StopSessionAsync(new StopSession(DateTime.UtcNow));    
 });
 

@@ -21,7 +21,8 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     public async Task RegisterVehicleDetectionAsync(RegisterVehicleDetection registerLocation)
     {
         _state.LastSeen = registerLocation.Timestamp;
-        var hasPermit = await _daprHttpClient.GetFromJsonAsync<bool>($"https://residents-apiservice/licenseplatehaspermit/{Id.GetId()}");
+        var hasPermit = await _daprHttpClient.GetFromJsonAsync<bool>(
+            $"https://residents-apiservice/licenseplatehaspermit/{Id.GetId()}");
         if(hasPermit)
         {
             await RemoveSessionAsync();
@@ -36,7 +37,11 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
         var reminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         if (reminder is null)
         {
-            await RegisterReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync), null, TimeSpan.FromMinutes(1), Timeout.InfiniteTimeSpan);
+            await RegisterReminderAsync(
+                nameof(CheckSessionStatusAfterGracePeriodReminderAsync), 
+                null, 
+                TimeSpan.FromSeconds(20), 
+                Timeout.InfiniteTimeSpan);
         }
     }
 
@@ -79,14 +84,21 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     private async Task SendParkingFeeAsync()
     {
         if (_state.ParkingFeeSent) return;
-        await _daprClient.PublishEventAsync("pubsub", nameof(RequiredSessionNotFound), new RequiredSessionNotFound(Id.GetId(), _state.LastSeen.GetValueOrDefault()));
+        await _daprClient.PublishEventAsync(
+            "pubsub", 
+            nameof(RequiredSessionNotFound),
+             new RequiredSessionNotFound(Id.GetId(), _state.LastSeen.GetValueOrDefault()));
         await RegisterExpiryReminderAsync();
         _state.ParkingFeeSent = true;
     }
 
     private async Task RegisterExpiryReminderAsync()
     {
-        await RegisterReminderAsync(nameof(ExpiryReminderAsync), null, TimeSpan.FromHours(24), Timeout.InfiniteTimeSpan);
+        await RegisterReminderAsync(
+            nameof(ExpiryReminderAsync), 
+            null, 
+            TimeSpan.FromHours(24), 
+            Timeout.InfiniteTimeSpan);
     }
 
     private async Task ExpiryReminderAsync()
