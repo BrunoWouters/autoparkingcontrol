@@ -140,7 +140,7 @@ async Task ProcesExtractedTextAsync(DateTime timestamp, string? extractedText)
         var letters = match.Groups["letters"].Value;
         var cijfers = match.Groups["cijfers"].Value;
         var licensePlate = $"{indexCijfer}-{letters}-{cijfers}";
-        var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor");
+        var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor", new ActorProxyOptions{RequestTimeout = TimeSpan.FromSeconds(1000)});
         await parkingSessionActor.RegisterVehicleDetectionAsync(new RegisterVehicleDetection(timestamp));
     }
 }
