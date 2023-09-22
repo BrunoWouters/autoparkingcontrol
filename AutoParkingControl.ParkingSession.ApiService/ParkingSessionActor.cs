@@ -23,6 +23,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
         _state.LastSeen = registerLocation.Timestamp;
         var hasPermit = await _daprHttpClient.GetFromJsonAsync<bool>(
             $"https://residents-apiservice/licenseplatehaspermit/{Id.GetId()}");
+        //http://localhost:<daprSidecarPort>/v1.0/invoke/residents-apiservice/method/licenseplatehaspermit/<licensePlate>
         if(hasPermit)
         {
             await RemoveSessionAsync();
@@ -34,9 +35,11 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
             return;
         }
 
+        //GET http://localhost:<daprSidecarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/reminders/CheckSessionStatusAfterGracePeriodReminderAsync
         var reminder = await GetReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         if (reminder is null)
         {
+            //POST http://localhost:<daprSideCarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/reminders/CheckSessionStatusAfterGracePeriodReminderAsync
             await RegisterReminderAsync(
                 nameof(CheckSessionStatusAfterGracePeriodReminderAsync), 
                 null, 
@@ -84,6 +87,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
     private async Task SendParkingFeeAsync()
     {
         if (_state.ParkingFeeSent) return;
+        //POST http://localhost:<daprSidecarPort>/v1.0/publish/pubsub/RequiredSessionNotFound
         await _daprClient.PublishEventAsync(
             "pubsub", 
             nameof(RequiredSessionNotFound),
@@ -94,6 +98,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
 
     private async Task RegisterExpiryReminderAsync()
     {
+        //POST http://localhost:<daprSidecarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/reminders/ExpiryReminderAsync
         await RegisterReminderAsync(
             nameof(ExpiryReminderAsync), 
             null, 
@@ -111,12 +116,14 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
         _isExpired = true;
         _state = new ParkingSessionState();
         await StateManager.TryRemoveStateAsync(nameof(ParkingSessionState));
+        //DELETE http://localhost:<daprSidecarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/reminders/CheckSessionStatusAfterGracePeriodReminderAsync
         await UnregisterReminderAsync(nameof(CheckSessionStatusAfterGracePeriodReminderAsync));
         await UnregisterReminderAsync(nameof(ExpiryReminderAsync));
     }
 
     protected override async Task OnActivateAsync()
     {
+        //GET http://localhost:<daprSidecarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/state/ParkingSessionState
         var tryGetResult = await StateManager.TryGetStateAsync<ParkingSessionState>(nameof(ParkingSessionState));
         _state = tryGetResult.HasValue ? tryGetResult.Value : new ParkingSessionState();
     }
@@ -129,6 +136,7 @@ public class ParkingSessionActor : Actor, IParkingSessionActor, IRemindable
             return;
         }
 
+        //POST http://localhost:<daprSidecarPort>/v1.0/actors/ParkingSessionState/<licensePlate>/state
         await StateManager.SetStateAsync(nameof(ParkingSessionState), _state);
     }
 }

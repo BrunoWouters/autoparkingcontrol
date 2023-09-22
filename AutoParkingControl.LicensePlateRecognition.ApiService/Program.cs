@@ -70,6 +70,7 @@ app.MapPost("/upload", async (IFormFile photo, IHttpClientFactory httpClientFact
     var httpClient = httpClientFactory.CreateClient("DaprComputerVisionHttpClient");
     var url = "computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview";
     photoContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+    //http://localhost:<daprSideCarPort>/v1.0/invoke/computervision/method/computervision/imageanalysis:analyze?features=read&api-version=2023-04-01-preview
     var response = await httpClient.PostAsync(url, photoContent);
     if(!response.IsSuccessStatusCode) return Results.BadRequest();
     var imageAnalysisResult = await response.Content.ReadFromJsonAsync<ImageAnalysisResult>();
@@ -142,6 +143,7 @@ async Task ProcesExtractedTextAsync(DateTime timestamp, string? extractedText)
         var licensePlate = $"{indexCijfer}-{letters}-{cijfers}";
         var parkingSessionActor = ActorProxy.Create<IParkingSessionActor>(new Dapr.Actors.ActorId(licensePlate), "ParkingSessionActor", new ActorProxyOptions{RequestTimeout = TimeSpan.FromSeconds(1000)});
         await parkingSessionActor.RegisterVehicleDetectionAsync(new RegisterVehicleDetection(timestamp));
+        //POST http://localhost:<daprSideCarPort>/v1.0/actors/ParkingSessionActor/<licensePlate>/method/RegisterVehicleDetectionAsync
     }
 }
 

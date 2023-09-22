@@ -26,11 +26,14 @@ app.MapPost("/sendfine", async ([FromBody] RequiredSessionNotFound requiredSessi
     var body = 
     @$"<b>Fine for {requiredSessionNotFound.LicensePlate}</b><br>
     On {requiredSessionNotFound.VehicleDetectedOn.ToLocalTime():G} we found your vehicle parked without a valid session.";
+    
+    //POST http://localhost:<daprSidecarPort>/v1.0/bindings/smtp
     await daprClient.InvokeBindingAsync("smtp", "create", body, new Dictionary<string, string>{
         {"emailFrom", "finedep@autoparkingcontrol.com"},
         {"emailTo", "finereceipient@mailprovider.com"},
         {"subject", "Fine"}
     });
 }).WithTopic("pubsub", "RequiredSessionNotFound");
+//Sidecar GET http://localhost:<appPort>/dapr/subscribe -> payload: topic <-> route binding
 
 app.Run();

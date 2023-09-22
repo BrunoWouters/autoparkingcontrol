@@ -21,6 +21,7 @@ await daprClient.SaveStateAsync("statestore", "2-DDJ-413", DateTime.UtcNow.AddDa
 
 app.MapGet("/licenseplatehaspermit/{licensePlate}", async (string licensePlate, DaprClient daprClient) =>
 {
+    //http://localhost:<daprSidecarPort>/v1.0/state/<storename>/<key>
     var licensePlatePermitExpiry = await daprClient.GetStateAsync<DateTime?>("statestore", licensePlate);
     if(licensePlatePermitExpiry == null) return false;
     return DateTime.UtcNow < licensePlatePermitExpiry;    
