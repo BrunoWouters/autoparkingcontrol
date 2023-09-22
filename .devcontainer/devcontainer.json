@@ -52,7 +52,7 @@
 	// Ensure Dapr is running on opening the container
 	"postCreateCommand": {
 		"MailDev": "docker run -p 1080:1080 -p 1025:1025 -d --name maildev maildev/maildev",
-	 	"Prometheus": "docker run --net=host -v ./prometheus.yaml:/etc/prometheus/prometheus.yaml --name prometheus prom/prometheus --config.file=/etc/prometheus/prometheus.yaml",
+	 	"Prometheus": "docker run -d --net=host -v ./prometheus.yaml:/etc/prometheus/prometheus.yaml --name prometheus prom/prometheus --config.file=/etc/prometheus/prometheus.yaml",
 		"Dapr": "dapr uninstall --all && dapr init"
 	}
 	// Configure tool-specific properties.
